@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Consistent_Header_Footer"
-        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" x:Class="Consistent_Header_Footer.MainWindow"
+        x:Class="Consistent_Header_Footer.MainWindow"
         mc:Ignorable="d"
         Title="Consistent Header and Footer" Height="200" Width="400" MinWidth="300" MinHeight="100">
     <Grid Margin="10,10,10,10">
@@ -20,12 +20,12 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="60"/>
             </Grid.ColumnDefinitions>
-            <ui:TextBox x:Name="txtPathFolder" Grid.Column="0" Text="TextBox"/>
-            <ui:Button x:Name="btnOpenFolderDialog" Grid.Column="2" Icon="FolderOpen20"/>
-            <ui:Button x:Name="btnStart" Grid.Column="4" Content="Start" Click="btnStart_Click" Icon="FolderOpen20"/>
+            <TextBox x:Name="txtPathFolder" Grid.Column="0" Text="TextBox"/>
+            <Button x:Name="btnOpenFolderDialog" Grid.Column="2"/>
+            <Button x:Name="btnStart" Grid.Column="4" Content="Start" Click="btnStart_Click" />
         </Grid>
         <Grid Grid.Row="1" Margin="0,5,0,0">
-            <ui:DataGrid ItemsSource="{Binding ViewModel.ProductsCollection, Mode=TwoWay}" />
+            <DataGrid d:ItemsSource="{d:SampleData ItemCount=5}" HeadersVisibility="Column"/>
         </Grid>     
     </Grid>
 </Window>
