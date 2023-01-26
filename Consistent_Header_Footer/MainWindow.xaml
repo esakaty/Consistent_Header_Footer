@@ -7,7 +7,10 @@
     xmlns:local="clr-namespace:Consistent_Header_Footer"
     xmlns:Design="clr-namespace:System.ComponentModel.Design;assembly=System.ComponentModel.TypeConverter"
     mc:Ignorable="d"
-    Title="Consistent Header and Footer" Height="200" Width="400" MinWidth="300" MinHeight="100">
+    Title="Consistent Header and Footer" Height="200" Width="800" MinWidth="300" MinHeight="100">
+    <Window.DataContext>
+        <local:Main_ViewModel/>
+    </Window.DataContext>
     <Grid Margin="10,10,10,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="20" />
@@ -22,18 +25,20 @@
                 <ColumnDefinition Width="60"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="60"/>
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="txtPathFolder" Grid.Column="0" Text="TextBox"/>
+            <TextBox x:Name="txtPathFolder" Grid.Column="0" Text="{Binding ValuePathFolder}" FlowDirection="RightToLeft"/>
             <Button x:Name="btnOpenFolderDialog" Grid.Column="2"/>
-            <Button x:Name="btnOpen"  Grid.Column="4" Content="Open"  Click="btnOpen_Click"  />
-            <Button x:Name="btnStart" Grid.Column="6" Content="Start" Click="btnStart_Click" />
+            <Button x:Name="btnOpen"  Grid.Column="4" Content="Open"
+                    Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
+            <Button x:Name="btnChek"  Grid.Column="6" Content="Check"
+                    Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
+            <Button x:Name="btnStart" Grid.Column="8" Content="Start"
+                    Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
         </Grid>
         <Grid Grid.Row="1" Margin="0,5,0,0">
-            <DataGrid x:Name="dataGrid_FileInfo" 
-                      HeadersVisibility="Column" 
-                      ItemsSource="{Binding}" 
-                      AutoGenerateColumns="True">
-            </DataGrid>
+            <DataGrid x:Name="datagrid_FileData" ItemsSource="{Binding ValueFileDataCollection}" CanUserAddRows="False" HeadersVisibility="Column"/>
         </Grid>
     </Grid>
 </Window>
