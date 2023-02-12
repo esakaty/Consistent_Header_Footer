@@ -28,7 +28,7 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="60"/>
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="txtPathFolder" Grid.Column="0" Text="{Binding ValuePathFolder}" FlowDirection="RightToLeft"/>
+            <TextBox x:Name="txtPathFolder" Grid.Column="0" Text="{Binding Path=ValuePathFolder, UpdateSourceTrigger=PropertyChanged}" FlowDirection="RightToLeft"/>
             <Button x:Name="btnOpenFolderDialog" Grid.Column="2"/>
             <Button x:Name="btnOpen"  Grid.Column="4" Content="Open"
                     Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
@@ -38,7 +38,10 @@
                     Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
         </Grid>
         <Grid Grid.Row="1" Margin="0,5,0,0">
-            <DataGrid x:Name="datagrid_FileData" ItemsSource="{Binding ValueFileDataCollection}" CanUserAddRows="False" HeadersVisibility="Column"/>
+            <!--
+            <DataGrid x:Name="datagrid_FileData" ItemsSource="{Binding Path=ValueFileDataCollection, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}" CanUserAddRows="False" HeadersVisibility="Column"/>
+            -->
+            <DataGrid ItemsSource="{Binding Path=ValueFileDataCollection, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
     </Grid>
 </Window>

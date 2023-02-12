@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Printing;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -45,16 +47,46 @@ namespace Consistent_Header_Footer
         Skip,
         Error
     }
-    public class FileData
+    public class FileData : INotifyPropertyChanged
     {
-        public String Path { get; set; } = "";
-        public int Group { get; set; }
-        public int No { get; set; }
-        public int StartPage { get; set; }
-        public int TotalPage { get; set; }
-        public int GroupTotalPage { get; set; }
-        public eState State { get; set; }
-        public bool Selected { get; set; }
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void RaisePropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        private String _Path {  get; set; } = "";
+        public String Path {    get=> _Path;    set{_Path = value;RaisePropertyChanged();}}
+
+        private int _Group {    get; set; }
+        public int Group {      get=>_Group;    set{_Group = value;RaisePropertyChanged();}}
+
+        private int _No {       get; set; }
+        public int No {         get=>_No;       set{_No = value;RaisePropertyChanged();}}
+
+        private int _StartPage{ get; set; }
+        public int StartPage{   get=> _StartPage;set{_StartPage = value;RaisePropertyChanged();}}
+
+        private int _TotalPage{ get; set; }
+        public int TotalPage{   get=> _TotalPage;set{_TotalPage = value;RaisePropertyChanged();}}
+
+        private int _GroupTotalPage{    get; set; }
+        public int GroupTotalPage{      get => _GroupTotalPage; set { _GroupTotalPage = value; RaisePropertyChanged(); } }
+
+        private eState _State { get; set; }
+        public eState State { get => _State; set { _State = value; RaisePropertyChanged(); } }
+
+        private bool _Selected { get; set; }
+        public bool Selected { get => _Selected; set { _Selected = value; RaisePropertyChanged(); } }
+
+        public void UpdataView()
+        {
+            DispatcherFrame frame = new DispatcherFrame();
+            var callback = new DispatcherOperationCallback(obj =>
+            {
+                ((DispatcherFrame)obj).Continue = false;
+                return null;
+            });
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, callback, frame);
+            Dispatcher.PushFrame(frame);
+        }
     }
     public class GroupData
     {
@@ -71,6 +103,7 @@ namespace Consistent_Header_Footer
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         public ObservableCollection<FileData> FileDatas { get; set; }
+        public int FileDataIndex;
         public List<GroupData> groupList { get; set; } = new List<GroupData>();
         public String PathFolder { get; set; }
 
@@ -84,6 +117,7 @@ namespace Consistent_Header_Footer
             {
                 PathFolder = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValuePathFolder)));
+                UpdataView();
             }
         }
         public ObservableCollection<FileData> ValueFileDataCollection
@@ -96,7 +130,20 @@ namespace Consistent_Header_Footer
             {
                 FileDatas = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueFileDataCollection)));
+                UpdataView();
             }
+        }
+
+        public void UpdataView()
+        {
+            DispatcherFrame frame = new DispatcherFrame();
+            var callback = new DispatcherOperationCallback(obj =>
+            {
+                ((DispatcherFrame)obj).Continue = false;
+                return null;
+            });
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, callback, frame);
+            Dispatcher.PushFrame(frame);
         }
 
         public Command_Buttons Command_Buttons { get;  set; }
@@ -154,10 +201,14 @@ namespace Consistent_Header_Footer
                 var fileNames = files.Select(file => System.IO.Path.GetFileName(file));
                 foreach (var (fileName, index) in fileNames.Select((filename, index) => (filename, index)))
                 {
-                    tmp_fileDatas.Add(new FileData()
+                    Dispatcher dispatcher= Dispatcher.CurrentDispatcher;
+                    dispatcher.Invoke((Action)(() =>
                     {
-                        Path = fileName,
-                    });
+                        tmp_fileDatas.Add(new FileData()
+                        {
+                            Path = fileName,
+                        });
+                    }));
                 }
                 _view.ValueFileDataCollection = tmp_fileDatas;
             }
@@ -171,15 +222,21 @@ namespace Consistent_Header_Footer
         {
             foreach (var fileData in _view.ValueFileDataCollection)
             {
+                Debug.Print("GetPageNum:"+fileData.Path);
                 GetPageNum(fileData);
+                fileData.UpdataView();
             }
             foreach (var fileData in _view.ValueFileDataCollection)
             {
+                Debug.Print("GetGroup:" + fileData.Path);
                 GetGroup(fileData);
+                fileData.UpdataView();
             }
-            foreach (var data in _view.ValueFileDataCollection)
+            foreach (var fileData in _view.ValueFileDataCollection)
             {
-                data.GroupTotalPage = _view.groupList[data.Group].GroupTotalPage;
+                Debug.Print("GroupTotalPage:" + fileData.Path);
+                fileData.GroupTotalPage = _view.groupList[fileData.Group].GroupTotalPage;
+                fileData.UpdataView();
             }
         }
 
