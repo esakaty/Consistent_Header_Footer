@@ -219,7 +219,5 @@ namespace Consistent_Header_Footer
                 UpdataView();
             }
         }
-
-
     }
 }
