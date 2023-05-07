@@ -48,6 +48,14 @@ namespace Consistent_Header_Footer
         Skip,
         Error
     }
+
+    public enum eType
+    {
+        Word,
+        Excel,
+        Other
+    }
+
     public class FileData : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -55,6 +63,9 @@ namespace Consistent_Header_Footer
 
         private String _Path {  get; set; } = "";
         public String Path {    get=> _Path;    set{_Path = value;RaisePropertyChanged();}}
+
+        private eType _Type {  get; set; } = eType.Other;
+        public eType Type {    get => _Type; set { _Type = value; RaisePropertyChanged(); } }
 
         private int _Group {    get; set; }
         public int Group {      get=>_Group;    set{_Group = value;RaisePropertyChanged();}}
@@ -114,6 +125,7 @@ namespace Consistent_Header_Footer
             visibilityStatusBar = Visibility.Hidden;
             valueStatusBar = 0;
             txtStatusBar = "処理中";
+
         }
         public void UpdataView()
         {
@@ -127,11 +139,12 @@ namespace Consistent_Header_Footer
             Dispatcher.PushFrame(frame);
         }
 
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public Command_Buttons Command_Buttons { get; set; }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
         public ObservableCollection<FileData> FileDatas { get; set; }
-        public int FileDataIndex;
+
         public List<GroupData> groupList { get; set; } = new List<GroupData>();
         public String PathFolder { get; set; }
         public bool bEnableOpelate { get; set; }
@@ -153,7 +166,6 @@ namespace Consistent_Header_Footer
                 UpdataView();
             }
         }
-
         public String Bind_PathFolder
         {
             get
@@ -192,7 +204,6 @@ namespace Consistent_Header_Footer
                 UpdataView();
             }
         }
-
         public Visibility Bind_visibilityStatusBar
         {
             get
@@ -219,7 +230,5 @@ namespace Consistent_Header_Footer
                 UpdataView();
             }
         }
-
-
     }
 }

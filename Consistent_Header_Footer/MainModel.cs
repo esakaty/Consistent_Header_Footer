@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace Consistent_Header_Footer
 {
@@ -33,7 +34,6 @@ namespace Consistent_Header_Footer
         {
             _view.Bind_visibilityStatusBar = Visibility.Visible;
             _view.Bind_EnableOpelate = false;
-            _view.Bind_txtStatusBar = "処理中";
             switch (parameter)
             {
                 case "btnOpenFolderDialog":
@@ -78,9 +78,19 @@ namespace Consistent_Header_Footer
                         Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
                         dispatcher.Invoke((Action)(() =>
                         {
+                            eType t = CheckFileType(fileName);
+                            int g = -1;
+                            bool s = false;
+                            if(t == eType.Word) {
+                                g = 0;
+                                s = true;
+                            }
                             tmp_fileDatas.Add(new FileData()
                             {
                                 Path = fileName,
+                                Type = t,
+                                Group= g,
+                                Selected = s,
                             });
                         }));
                     }
@@ -91,6 +101,22 @@ namespace Consistent_Header_Footer
             {
                 System.Diagnostics.Debug.WriteLine(ex);
             }
+        }
+
+        /// <summary>
+        /// ファイルタイプ判定
+        /// </summary>
+        /// <param name="path">ファイルパス</param>
+        /// <returns>ファイルタイプ(Word/Excel/Other)</returns>
+        private eType CheckFileType(String path)
+        {
+            eType t = eType.Other;
+            System.IO.FileInfo fi = new System.IO.FileInfo(path);
+            if (fi.Extension.Substring(1, 3) == "doc")
+            {
+                t= eType.Word;
+            }
+            return t;
         }
 
         /// <summary>
@@ -105,29 +131,40 @@ namespace Consistent_Header_Footer
                 {
                     int count = 0;
                     int total = _view.Bind_FileDataCollection.Count() * 3;
-                    foreach (var fileData in _view.Bind_FileDataCollection)
+                    foreach(var data in _view.Bind_FileDataCollection.Select((value, index) => new { value, index }))
                     {
-                        System.IO.FileInfo fi = new System.IO.FileInfo(fileData.Path);
-                        if(fi.Extension.Substring(1, 3) == "doc")
+                        _view.Bind_txtStatusBar = "ページ数取得"+ (data.index + 1) + "/"+ _view.Bind_FileDataCollection.Count();
+                        if (data.value.Type == eType.Word)
                         {
-                            Debug.Print("GetPageNum(Word):" + fileData.Path);
-                            fileData.TotalPage = GetPageNum_Word(fileData);
-                            fileData.UpdataView();
+                            Debug.Print("GetPageNum(Word):" + data.value.Path);
+                            data.value.TotalPage = GetPageNum_Word(data.value);
+                            data.value.UpdataView();
                         }
                         _view.Bind_valueStatusBar = (count++) * 100 / total;
                     }
-                    foreach (var fileData in _view.Bind_FileDataCollection)
+                    foreach (var data in _view.Bind_FileDataCollection.Select((value, index) => new { value, index }))
                     {
-                        Debug.Print("GetGroup:" + fileData.Path);
-                        GetGroup(fileData);
-                        fileData.UpdataView();
-                    }
-                    foreach (var fileData in _view.Bind_FileDataCollection)
-                    {
-                        Debug.Print("GroupTotalPage:" + fileData.Path);
-                        fileData.GroupTotalPage = _view.groupList[fileData.Group].GroupTotalPage;
-                        fileData.UpdataView();
+                        _view.Bind_txtStatusBar = "グループ設定" + (data.index + 1) + "/" + _view.Bind_FileDataCollection.Count();
+                        if (data.value.Type == eType.Word)
+                        {
+                            Debug.Print("GetGroup:" + data.value.Path);
+                            GetGroup(data.value);
+                            data.value.UpdataView();
+                        }
                         _view.Bind_valueStatusBar = (count++) * 100 / total;
+
+                    }
+                    foreach (var data in _view.Bind_FileDataCollection.Select((value, index) => new { value, index }))
+                    {
+                        _view.Bind_txtStatusBar = "グループ設定" + (data.index + 1) + "/" + _view.Bind_FileDataCollection.Count();
+                        if (data.value.Type == eType.Word)
+                        {
+                            Debug.Print("GroupTotalPage:" + data.value.Path);
+                            data.value.GroupTotalPage = _view.groupList[data.value.Group].GroupTotalPage;
+                            data.value.UpdataView();
+                        }
+                        _view.Bind_valueStatusBar = (count++) * 100 / total;
+
                     }
                 });
             }
@@ -143,9 +180,15 @@ namespace Consistent_Header_Footer
             {
                 await System.Threading.Tasks.Task.Run(() =>
                 {
+                    int count = 0;
+                    int total = _view.Bind_FileDataCollection.Count();
                     foreach (FileData file in _view.Bind_FileDataCollection)
                     {
-                        UpdateFooter_Word(file);
+                        if (file.Type == eType.Word)
+                        {
+                            UpdateFooter_Word(file);
+                        }
+                        _view.Bind_valueStatusBar = (count++) * 100 / total;
                     }
                 });
             }
