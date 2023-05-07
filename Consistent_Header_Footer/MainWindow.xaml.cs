@@ -24,6 +24,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.Office.Interop.Word;
+using Microsoft.VisualBasic;
 using static System.Collections.Specialized.BitVector32;
 
 namespace Consistent_Header_Footer
@@ -128,6 +129,7 @@ namespace Consistent_Header_Footer
             }
             set
             {
+                CanHoge = false;
                 FileDatas = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValueFileDataCollection)));
                 UpdataView();
@@ -148,11 +150,18 @@ namespace Consistent_Header_Footer
 
         public Command_Buttons Command_Buttons { get;  set; }
 
+        public bool CanHoge { get; set; }
+        public String txtStatusBar { get; set; }
+
         public Main_ViewModel()
         {
             Command_Buttons = new Command_Buttons(this);
             FileDatas = new ObservableCollection<FileData>();
-            PathFolder = System.IO.Path.GetDirectoryName(                System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\TargetFolder";
+            PathFolder = System.IO.Path.GetDirectoryName(
+                System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\TargetFolder";
+
+            CanHoge = true;
+            txtStatusBar = "処理中";
         }
     }
 
@@ -169,20 +178,26 @@ namespace Consistent_Header_Footer
 
         public bool CanExecute(object? parameter) { return true; }
 
-        public void Execute(object? parameter)
+        public async void Execute(object? parameter)
         {
             switch (parameter)
             {
+                case "btnOpenFolderDialog":
+                    _view.CanHoge = false;
+                    _view.txtStatusBar = "処理中？？？";
+                    _view.UpdataView();
+                    break;
+
                 case "btnOpen":
-                    OpenFolder();
+                    await async_OpenFolder();
                     break;
 
                 case "btnChek":
-                    CheckFolder();
+                    await async_CheckFolder();
                     break;
 
                 case "btnStart":
-                    StartFolder();
+                    await async_StartFolder();
                     break;
 
                 default:
@@ -190,6 +205,37 @@ namespace Consistent_Header_Footer
             }
         }
 
+        private async System.Threading.Tasks.Task heaby_operate_ornerAsync2()
+        {
+            await System.Threading.Tasks.Task.Run(() =>
+            {
+                foreach (var fileData in _view.ValueFileDataCollection)
+                {
+                    for (int j = 0; j < 5; j++)
+                    {
+                        fileData.No = j;
+                        fileData.UpdataView();
+                        System.Threading.Thread.Sleep(1000);
+                    }
+                    System.Threading.Thread.Sleep(1000);
+                }
+            });
+        }
+
+        private async System.Threading.Tasks.Task async_OpenFolder()
+        {
+            await System.Threading.Tasks.Task.Run(() =>
+            {
+                try
+                {
+                    OpenFolder();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex);
+                }
+            });
+        }
 
         private void OpenFolder()
         {
@@ -218,6 +264,21 @@ namespace Consistent_Header_Footer
             }
         }
 
+        private async System.Threading.Tasks.Task async_CheckFolder()
+        {
+            await System.Threading.Tasks.Task.Run(() =>
+            {
+                try
+                {
+                    CheckFolder();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex);
+                }
+            });
+        }
+
         private void CheckFolder()
         {
             foreach (var fileData in _view.ValueFileDataCollection)
@@ -238,6 +299,20 @@ namespace Consistent_Header_Footer
                 fileData.GroupTotalPage = _view.groupList[fileData.Group].GroupTotalPage;
                 fileData.UpdataView();
             }
+        }
+        private async System.Threading.Tasks.Task async_StartFolder()
+        {
+            await System.Threading.Tasks.Task.Run(() =>
+            {
+                try
+                {
+                    StartFolder();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex);
+                }
+            });
         }
 
         private void StartFolder()

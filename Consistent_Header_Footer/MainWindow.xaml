@@ -7,14 +7,15 @@
     xmlns:local="clr-namespace:Consistent_Header_Footer"
     xmlns:Design="clr-namespace:System.ComponentModel.Design;assembly=System.ComponentModel.TypeConverter"
     mc:Ignorable="d"
-    Title="Consistent Header and Footer" Height="200" Width="800" MinWidth="300" MinHeight="100">
+    Title="Consistent Header and Footer" Height="250" Width="800" MinWidth="300" MinHeight="100">
     <Window.DataContext>
         <local:Main_ViewModel/>
     </Window.DataContext>
-    <Grid Margin="10,10,10,10">
+    <Grid Margin="10,10,10,5">
         <Grid.RowDefinitions>
             <RowDefinition Height="20" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="25" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -29,8 +30,10 @@
                 <ColumnDefinition Width="60"/>
             </Grid.ColumnDefinitions>
             <TextBox x:Name="txtPathFolder" Grid.Column="0" Text="{Binding Path=ValuePathFolder, UpdateSourceTrigger=PropertyChanged}" FlowDirection="RightToLeft"/>
-            <Button x:Name="btnOpenFolderDialog" Grid.Column="2"/>
+            <Button x:Name="btnOpenFolderDialog" Grid.Column="2" Content="..."
+                    Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
             <Button x:Name="btnOpen"  Grid.Column="4" Content="Open"
+                    IsEnabled="{Binding CanHoge, UpdateSourceTrigger=PropertyChanged}"
                     Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
             <Button x:Name="btnChek"  Grid.Column="6" Content="Check"
                     Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
@@ -43,5 +46,12 @@
             -->
             <DataGrid ItemsSource="{Binding Path=ValueFileDataCollection, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
+        <Grid Grid.Row="2" Margin="0,5,0,0">
+            <StatusBar>
+                <ProgressBar Height="10" Width="100"/>
+                <TextBlock Text="{Binding txtStatusBar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </StatusBar>
+        </Grid>
     </Grid>
 </Window>
+    
