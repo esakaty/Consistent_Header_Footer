@@ -45,12 +45,15 @@
                     Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
         </Grid>
         <Grid Grid.Row="1" Margin="0,5,0,0">
-            <DataGrid ItemsSource="{Binding Path=Bind_FileDataCollection, UpdateSourceTrigger=PropertyChanged}"/>
+            <DataGrid ItemsSource="{Binding Path=Bind_FileDataCollection, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"
+                      MouseDoubleClick=""/>
         </Grid>
         <Grid Grid.Row="2" Margin="0,5,0,0">
             <StatusBar Visibility="{Binding Path=Bind_visibilityStatusBar, UpdateSourceTrigger=PropertyChanged}">
-                <ProgressBar Height="10" Width="100"/>
-                <TextBlock Text="{Binding Path=Bind_txtStatusBar, UpdateSourceTrigger=PropertyChanged}"/>
+                <ProgressBar Height="10" Width="100"
+                    Value="{Binding Path=Bind_valueStatusBar, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock 
+                    Text="{Binding Path=Bind_txtStatusBar, UpdateSourceTrigger=PropertyChanged}"/>
             </StatusBar>
         </Grid>
     </Grid>

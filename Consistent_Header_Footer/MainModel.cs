@@ -40,15 +40,15 @@ namespace Consistent_Header_Footer
                     break;
 
                 case "btnOpen":
-                    await OpenFolder();
+                    await Operate_Open();
                     break;
 
                 case "btnChek":
-                    await CheckFolder();
+                    await Opelate_Check();
                     break;
 
                 case "btnStart":
-                    await StartFolder();
+                    await Opelate_Start();
                     break;
 
                 default:
@@ -58,7 +58,12 @@ namespace Consistent_Header_Footer
             _view.Bind_visibilityStatusBar = Visibility.Hidden;
         }
 
-        private async System.Threading.Tasks.Task OpenFolder()
+        /// <summary>
+        /// フォルダ展開
+        /// 対象フォルダを開き、すべてのファイルをFileDataCollectionへ展開する。
+        /// </summary>
+        /// <returns></returns>
+        private async System.Threading.Tasks.Task Operate_Open()
         {
             try
             {
@@ -88,17 +93,28 @@ namespace Consistent_Header_Footer
             }
         }
 
-        private async System.Threading.Tasks.Task CheckFolder()
+        /// <summary>
+        /// フォルダチェック
+        /// </summary>
+        /// <returns></returns>
+        private async System.Threading.Tasks.Task Opelate_Check()
         {
             try
             {
                 await System.Threading.Tasks.Task.Run(() =>
                 {
+                    int count = 0;
+                    int total = _view.Bind_FileDataCollection.Count() * 3;
                     foreach (var fileData in _view.Bind_FileDataCollection)
                     {
-                        Debug.Print("GetPageNum:" + fileData.Path);
-                        GetPageNum(fileData);
-                        fileData.UpdataView();
+                        System.IO.FileInfo fi = new System.IO.FileInfo(fileData.Path);
+                        if(fi.Extension.Substring(1, 3) == "doc")
+                        {
+                            Debug.Print("GetPageNum(Word):" + fileData.Path);
+                            fileData.TotalPage = GetPageNum_Word(fileData);
+                            fileData.UpdataView();
+                        }
+                        _view.Bind_valueStatusBar = (count++) * 100 / total;
                     }
                     foreach (var fileData in _view.Bind_FileDataCollection)
                     {
@@ -111,7 +127,8 @@ namespace Consistent_Header_Footer
                         Debug.Print("GroupTotalPage:" + fileData.Path);
                         fileData.GroupTotalPage = _view.groupList[fileData.Group].GroupTotalPage;
                         fileData.UpdataView();
-                        }
+                        _view.Bind_valueStatusBar = (count++) * 100 / total;
+                    }
                 });
             }
             catch (Exception ex)
@@ -120,7 +137,7 @@ namespace Consistent_Header_Footer
             }
         }
 
-        private async System.Threading.Tasks.Task StartFolder()
+        private async System.Threading.Tasks.Task Opelate_Start()
         {
             try
             {
@@ -138,19 +155,21 @@ namespace Consistent_Header_Footer
             }
         }
 
-        private void GetPageNum(FileData file)
+        private int GetPageNum_Word(FileData file)
         {
+            int pagenum = -1;
             if (!string.IsNullOrEmpty(file.Path))
             {
                 var wordApp = new Microsoft.Office.Interop.Word.Application();
                 var doc = wordApp.Documents.Open(_view.PathFolder + "\\" + file.Path);
 
-                file.TotalPage = doc.ComputeStatistics(WdStatistic.wdStatisticPages);
+                pagenum = doc.ComputeStatistics(WdStatistic.wdStatisticPages);
                 doc.Close();
                 // todo 何かを待たないと最後のファイルがエラーになる。
                 System.Threading.Thread.Sleep(500);
                 wordApp.Quit();
             }
+            return pagenum;
         }
 
         private void GetGroup(FileData file)

@@ -102,6 +102,33 @@ namespace Consistent_Header_Footer
     ///============================================================
     public class Main_ViewModel : INotifyPropertyChanged
     {
+        public Main_ViewModel()
+        {
+            Command_Buttons = new Command_Buttons(this);
+            FileDatas = new ObservableCollection<FileData>();
+            PathFolder = System.IO.Path.GetDirectoryName(
+                System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\TargetFolder";
+
+            bEnableOpelate = true;
+
+            visibilityStatusBar = Visibility.Hidden;
+            valueStatusBar = 0;
+            txtStatusBar = "処理中";
+        }
+        public void UpdataView()
+        {
+            DispatcherFrame frame = new DispatcherFrame();
+            var callback = new DispatcherOperationCallback(obj =>
+            {
+                ((DispatcherFrame)obj).Continue = false;
+                return null;
+            });
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, callback, frame);
+            Dispatcher.PushFrame(frame);
+        }
+
+        public Command_Buttons Command_Buttons { get; set; }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         public ObservableCollection<FileData> FileDatas { get; set; }
         public int FileDataIndex;
@@ -110,6 +137,8 @@ namespace Consistent_Header_Footer
         public bool bEnableOpelate { get; set; }
         public String txtStatusBar { get; set; }
         public Visibility visibilityStatusBar { get; set; }
+        public int valueStatusBar { get; set; }
+
 
         public ObservableCollection<FileData> Bind_FileDataCollection
         {
@@ -177,32 +206,20 @@ namespace Consistent_Header_Footer
                 UpdataView();
             }
         }
-
-        public void UpdataView()
+        public int Bind_valueStatusBar
         {
-            DispatcherFrame frame = new DispatcherFrame();
-            var callback = new DispatcherOperationCallback(obj =>
+            get
             {
-                ((DispatcherFrame)obj).Continue = false;
-                return null;
-            });
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, callback, frame);
-            Dispatcher.PushFrame(frame);
+                return valueStatusBar;
+            }
+            set
+            {
+                valueStatusBar = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Bind_valueStatusBar)));
+                UpdataView();
+            }
         }
 
-        public Command_Buttons Command_Buttons { get;  set; }
 
-        public Main_ViewModel()
-        {
-            Command_Buttons = new Command_Buttons(this);
-            FileDatas = new ObservableCollection<FileData>();
-            PathFolder = System.IO.Path.GetDirectoryName(
-                System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\TargetFolder";
-
-            bEnableOpelate = true;
-
-            visibilityStatusBar = Visibility.Hidden;
-            txtStatusBar = "処理中";
-        }
     }
 }
