@@ -29,27 +29,28 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="60"/>
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="txtPathFolder" Grid.Column="0" Text="{Binding Path=ValuePathFolder, UpdateSourceTrigger=PropertyChanged}" FlowDirection="RightToLeft"/>
+            <TextBox x:Name="txtPathFolder" Grid.Column="0" 
+                    IsEnabled="{Binding Path=Bind_EnableOpelate, UpdateSourceTrigger=PropertyChanged}"
+                    Text="{Binding Path=Bind_PathFolder, UpdateSourceTrigger=PropertyChanged}" FlowDirection="RightToLeft"/>
             <Button x:Name="btnOpenFolderDialog" Grid.Column="2" Content="..."
                     Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
             <Button x:Name="btnOpen"  Grid.Column="4" Content="Open"
-                    IsEnabled="{Binding CanHoge, UpdateSourceTrigger=PropertyChanged}"
+                    IsEnabled="{Binding Path=Bind_EnableOpelate, UpdateSourceTrigger=PropertyChanged}"
                     Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
             <Button x:Name="btnChek"  Grid.Column="6" Content="Check"
+                    IsEnabled="{Binding Path=Bind_EnableOpelate, UpdateSourceTrigger=PropertyChanged}"
                     Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
             <Button x:Name="btnStart" Grid.Column="8" Content="Start"
+                    IsEnabled="{Binding Path=Bind_EnableOpelate, UpdateSourceTrigger=PropertyChanged}"
                     Command="{Binding Command_Buttons}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Name}"/>
         </Grid>
         <Grid Grid.Row="1" Margin="0,5,0,0">
-            <!--
-            <DataGrid x:Name="datagrid_FileData" ItemsSource="{Binding Path=ValueFileDataCollection, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}" CanUserAddRows="False" HeadersVisibility="Column"/>
-            -->
-            <DataGrid ItemsSource="{Binding Path=ValueFileDataCollection, UpdateSourceTrigger=PropertyChanged}"/>
+            <DataGrid ItemsSource="{Binding Path=Bind_FileDataCollection, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
         <Grid Grid.Row="2" Margin="0,5,0,0">
-            <StatusBar>
+            <StatusBar Visibility="{Binding Path=Bind_visibilityStatusBar, UpdateSourceTrigger=PropertyChanged}">
                 <ProgressBar Height="10" Width="100"/>
-                <TextBlock Text="{Binding txtStatusBar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{Binding Path=Bind_txtStatusBar, UpdateSourceTrigger=PropertyChanged}"/>
             </StatusBar>
         </Grid>
     </Grid>
